@@ -1,43 +1,35 @@
+VIDEO_PREFIX  = "/video/pbskids"
+NAME          = "PBS Kids"
 
-# PMS plugin framework v2
+PBSKIDS_URL   = "http://www.pbskids.org/video/"
+PBSKIDS_SHOWS = "http://pbskids.org/everything.html"
+PBS_JSON      = "http://pbs.feeds.theplatform.com/ps/JSON/PortalService/2.2/getReleaseList?PID=6HSLquMebdOkNaEygDWyPOIbkPAnQ0_C&startIndex=1&endIndex=500&sortField=airdate&sortDescending=true&query=contentCustomBoolean|isClip|%s&field=airdate&field=author&field=bitrate&field=description&field=format&field=length&field=PID&field=thumbnailURL&field=title&field=URL&contentCustomField=isClip&param=affiliate|prekPlayer&field=categories&field=expirationDate&query=categories|%s"
+CATEGORY_LIST = "http://pbs.feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=6HSLquMebdOkNaEygDWyPOIbkPAnQ0_C&query=CustomText|CategoryType|%s&query=HasReleases&field=title&field=thumbnailURL"
 
-####################################################################################################
-
-VIDEO_PREFIX     = "/video/pbskids"
-PBSKIDS_URL      = "http://www.pbskids.org/video/"
-PBSKIDS_SHOWS    = "http://pbskids.org/everything.html"
-PBS_JSON         = "http://pbs.feeds.theplatform.com/ps/JSON/PortalService/2.2/getReleaseList?PID=6HSLquMebdOkNaEygDWyPOIbkPAnQ0_C&startIndex=1&endIndex=500&sortField=airdate&sortDescending=true&query=contentCustomBoolean|isClip|%s&field=airdate&field=author&field=bitrate&field=description&field=format&field=length&field=PID&field=thumbnailURL&field=title&field=URL&contentCustomField=isClip&param=affiliate|prekPlayer&field=categories&field=expirationDate&query=categories|%s"
-
-CATEGORY_LIST    = "http://pbs.feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=6HSLquMebdOkNaEygDWyPOIbkPAnQ0_C&query=CustomText|CategoryType|%s&query=HasReleases&field=title&field=thumbnailURL"
-NAME = L('Title')
-
-
-# make sure to replace artwork with what you want
-# these filenames reference the example files in
-# the Contents/Resources/ folder in the bundle
-ART           = 'art-default.jpg'
-ICON          = 'icon-default.gif'
+ART           = "art-default.jpg"
+ICON          = "icon-default.png"
 
 ####################################################################################################
-
 def Start():
-  Plugin.AddPrefixHandler(VIDEO_PREFIX, MainMenu, NAME, ICON, ART)
-  Plugin.AddViewGroup("InfoList", viewMode="InfoList", mediaType="items")
-  Plugin.AddViewGroup("List", viewMode="List", mediaType="items")
-  MediaContainer.art = R(ART)
-  MediaContainer.title1 = NAME
-  DirectoryItem.thumb=R(ICON)
-  
+    Plugin.AddPrefixHandler(VIDEO_PREFIX, MainMenu, NAME, ICON, ART)
+    Plugin.AddViewGroup("InfoList", viewMode="InfoList", mediaType="items")
+    Plugin.AddViewGroup("List", viewMode="List", mediaType="items")
+    MediaContainer.art = R(ART)
+    MediaContainer.title1 = NAME
+    DirectoryItem.thumb=R(ICON)
+
+    HTTP.CacheTime = CACHE_1HOUR
+
 ####################################################################################################
 def MainMenu():
-    dir = MediaContainer(mediaType='video', viewGroup='List')
+    dir = MediaContainer(viewGroup="List")
     dir.Append(Function(DirectoryItem(ShowsList, "Shows"), categoryType = "Show"))
     dir.Append(Function(DirectoryItem(ShowsList, "Topics"), categoryType = "Channel"))
     return dir
- 
+
 ####################################################################################################
 def ShowPage(sender, title, thumb):
-    dir = MediaContainer(title2=sender.itemTitle, viewGroup='List')
+    dir = MediaContainer(title2=sender.itemTitle, viewGroup="List")
     #title = title.replace(' ', '%20').replace('&', '%26')  ### FORMATTING FIX
     dir.Append(Function(DirectoryItem(VideoPage, "Full Episodes", thumb=thumb), clip='false', title=title))
     dir.Append(Function(DirectoryItem(VideoPage, "Clips", thumb=thumb), clip='true', title=title))
@@ -83,7 +75,7 @@ def VideoPlayer(sender, link):
 
 ####################################################################################################
 def ShowsList(sender, categoryType):
-    dir = MediaContainer(title2=sender.itemTitle, viewGroup='List')
+    dir = MediaContainer(title2=sender.itemTitle, viewGroup="List")
     content = JSON.ObjectFromURL(CATEGORY_LIST % categoryType)
     for item in content['items']:
         title = item['title']
@@ -97,4 +89,3 @@ def ShowsList(sender, categoryType):
                 else:
                     dir.Append(Function(DirectoryItem(VideoPage, title, thumb=thumb), clip='true', title=title))
     return dir
-
