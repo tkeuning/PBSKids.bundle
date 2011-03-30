@@ -33,7 +33,11 @@ def ShowPage(sender, title, thumb):
     #title = title.replace(' ', '%20').replace('&', '%26')  ### FORMATTING FIX
     dir.Append(Function(DirectoryItem(VideoPage, "Full Episodes", thumb=thumb), clip='false', title=title))
     dir.Append(Function(DirectoryItem(VideoPage, "Clips", thumb=thumb), clip='true', title=title))
-    return dir
+
+    if len(dir) == 0:
+        return MessageContainer("Empty", "There aren't any items")
+    else:
+        return dir
 
 ####################################################################################################
 def VideoPage(sender, clip, title):
@@ -53,7 +57,11 @@ def VideoPage(sender, clip, title):
         duration = item['length']
         Log(duration)
         dir.Append(Function(VideoItem(VideoPlayer, title=title, thumb=thumb, summary=summary, duration=duration), link=link))
-    return dir
+
+    if len(dir) == 0:
+        return MessageContainer("Empty", "There aren't any items")
+    else:
+        return dir
 
 ####################################################################################################
 def VideoPlayer(sender, link):
