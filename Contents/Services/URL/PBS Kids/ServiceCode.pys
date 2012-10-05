@@ -1,0 +1,41 @@
+NAMESPACES = {"a" : "http://www.w3.org/2001/SMIL20/Language", "tp" : "http://xml.theplatform.com/mps/metadata/content/custom"}
+
+####################################################################################################
+def MetadataObjectForURL(url):
+    smil = XML.ElementFromURL(url + '&format=SMIL')
+    video = smil.xpath('//a:ref', namespaces=NAMESPACES)[0]
+    title = video.get('title')
+    duration = int(video.get('dur').strip('ms'))
+    
+    return VideoClipObject(
+        title = title,
+        thumb = R('icon-default.png'),
+        duration = duration
+    )
+
+####################################################################################################
+def MediaObjectsForURL(url):
+
+    return [
+      MediaObject(
+        #container = Container.RTMP,
+        video_codec = VideoCodec.H264,
+        audio_codec = AudioCodec.AAC,
+        video_resolution = 360,
+        parts = [PartObject(key=Callback(PlayVideo, url = url))]
+      )
+    ]
+
+####################################################################################################
+@indirect
+def PlayVideo(url):
+
+    smil = XML.ElementFromURL(url + '&format=SMIL')
+    
+    rtmp_base = smil.xpath('//a:meta', namespaces=NAMESPACES)[0].get('base')
+    rtmp_url = smil.xpath('//a:ref', namespaces=NAMESPACES)[0].get('src')
+    
+    rtmp_player = rtmp_base + rtmp_url
+    
+    return IndirectResponse(VideoClipObject, key=RTMPVideoURL(url=rtmp_player))
+    
