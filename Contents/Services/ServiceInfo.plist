@@ -9,7 +9,6 @@
 			<key>TestURLs</key>
 			<array>
 				<string>http://release.theplatform.com/content.select\?pid=3CxvEh2lftsC1ypeLZXmKt6Vu50ksjYL%26UserName=Unknown%26affiliate=prekPlayer%26Embedded=True%26Portal=PBS%20KidsGo%20Default%20Feed%26Tracking=True</string>
-				<string>http://www.bing.com/videos/watch/video/the-waltons-40-years-later/6lmnx76</string>
 			</array>
 			<key>URLPatterns</key>
 			<array>
