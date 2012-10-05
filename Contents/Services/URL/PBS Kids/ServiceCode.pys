@@ -18,7 +18,6 @@ def MediaObjectsForURL(url):
 
     return [
       MediaObject(
-        #container = Container.RTMP,
         video_codec = VideoCodec.H264,
         audio_codec = AudioCodec.AAC,
         video_resolution = 360,
