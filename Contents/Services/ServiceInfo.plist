@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>URL</key>
+	<dict>
+		<key>PBS Kids</key>
+		<dict>
+			<key>TestURLs</key>
+			<array>
+				<string>http://release.theplatform.com/content.select\?pid=3CxvEh2lftsC1ypeLZXmKt6Vu50ksjYL%26UserName=Unknown%26affiliate=prekPlayer%26Embedded=True%26Portal=PBS%20KidsGo%20Default%20Feed%26Tracking=True</string>
+			</array>
+			<key>URLPatterns</key>
+			<array>
+				<string>http://release.theplatform.com/content.select\?pid=.+?Portal=PBS%20KidsGo.*</string>
+			</array>
+		</dict>
+	</dict>
+	<key>PlexFrameworkFlags</key>
+	<array>
+		<string>UseRealRTMP</string>
+	</array>
+</dict>
+</plist>
