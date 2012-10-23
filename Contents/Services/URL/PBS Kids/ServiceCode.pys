@@ -34,7 +34,11 @@ def PlayVideo(url):
     rtmp_base = smil.xpath('//a:meta', namespaces=NAMESPACES)[0].get('base')
     rtmp_url = smil.xpath('//a:ref', namespaces=NAMESPACES)[0].get('src')
     
-    rtmp_player = rtmp_base + rtmp_url
+    clip = rtmp_url
+    if '.mp4' in clip:
+        clip = 'mp4:' +  clip.split('.mp4')[0]
+    elif '.flv' in clip:
+        clip = clip.split('.flv')[0]
     
-    return IndirectResponse(VideoClipObject, key=RTMPVideoURL(url=rtmp_player))
+    return IndirectResponse(VideoClipObject, key=RTMPVideoURL(url=rtmp_base, clip=clip))
     
