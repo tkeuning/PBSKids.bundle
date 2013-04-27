@@ -1,18 +1,23 @@
 JSON_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?id='
+
 ####################################################################################################
 def MetadataObjectForURL(url):
+
     details = GetJSON(url)
+
     title = details['title']
-    try:    thumb = item['images']['originalres_4x3']['url']
-    except:
-        try:    thumb = item['images']['originalres_16x9']['url']
-        except: thumb = R('icon-deafult.jpg')
     summary = details['description']
     duration = details['videos']['ipad']['length']
+
+    try: thumb = item['images']['originalres_4x3']['url']
+    except:
+        try: thumb = item['images']['originalres_16x9']['url']
+        except: thumb = ''
+
     if details['type'] =='Clip':
         return VideoClipObject(
             title = title,
-            summary=summary,
+            summary = summary,
             thumb = Resource.ContentsOfURLWithFallback(thumb)
         )
     else:
@@ -28,17 +33,18 @@ def MetadataObjectForURL(url):
 def MediaObjectsForURL(url):
 
     return [
-      MediaObject(
-        video_codec = VideoCodec.H264,
-        audio_codec = AudioCodec.AAC,
-        protocol = 'hls',
-        parts = [PartObject(key=Callback(PlayVideo, url=url))],
-      )
+        MediaObject(
+            video_codec = VideoCodec.H264,
+            audio_codec = AudioCodec.AAC,
+            protocol = 'hls',
+            parts = [PartObject(key=Callback(PlayVideo, url=url))],
+        )
     ]
 
 ####################################################################################################
 @indirect
 def PlayVideo(url):
+
     details = GetJSON(url)
     try:    redirect_url = details['videos']['ipad']['url']
     except: redirect_url = details['videos']['iphone']['url']
@@ -47,6 +53,7 @@ def PlayVideo(url):
     
 ####################################################################################################
 def GetJSON(url):
+
     video_id = url.split('id=')[1]
     json = JSON.ObjectFromURL(JSON_URL + video_id)
     return json['items'][0]
