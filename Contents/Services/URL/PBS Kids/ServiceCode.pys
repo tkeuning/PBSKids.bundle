@@ -6,7 +6,7 @@ def MetadataObjectForURL(url):
     try:    thumb = item['images']['originalres_4x3']['url']
         except:
             try:    thumb = item['images']['originalres_16x9']['url']
-            except: thumb = R('icon-deafult.jpg)
+            except: thumb = R('icon-deafult.jpg')
     summary = details['description']
     duration = details['videos']['ipad']['length']
     if details['type'] =='Clip':
