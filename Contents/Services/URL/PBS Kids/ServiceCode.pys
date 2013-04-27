@@ -1,17 +1,25 @@
-NAMESPACES = {"a" : "http://www.w3.org/2001/SMIL20/Language", "tp" : "http://xml.theplatform.com/mps/metadata/content/custom"}
-
+JSON_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?id='
 ####################################################################################################
 def MetadataObjectForURL(url):
-    smil = XML.ElementFromURL(url + '&format=SMIL')
-    video = smil.xpath('//a:ref', namespaces=NAMESPACES)[0]
-    title = video.get('title')
-    duration = int(video.get('dur').strip('ms'))
-    
-    return VideoClipObject(
-        title = title,
-        thumb = R('icon-default.png'),
-        duration = duration
-    )
+    details = GetJSON(url)
+    title = details['title']
+    thumb = details['images']['originalres_4x3']
+    summary = details['description']
+    duration = details['videos']['ipad']['length']
+    if details['type'] =='Clip':
+        return VideoClipObject(
+            title = title,
+            summary=summary,
+            thumb = Resource.ContentsOfURLWithFallback(thumb)
+        )
+    else:
+        show_title = details['series_title']
+        return EpisodeObject(
+            title = title,
+            show = show_title,
+            summary = summary,
+            thumb = Resource.ContentsOfURLWithFallback(thumb)
+        )
 
 ####################################################################################################
 def MediaObjectsForURL(url):
@@ -20,25 +28,22 @@ def MediaObjectsForURL(url):
       MediaObject(
         video_codec = VideoCodec.H264,
         audio_codec = AudioCodec.AAC,
-        video_resolution = 360,
-        parts = [PartObject(key=Callback(PlayVideo, url = url))]
+        protocol = 'hls',
+        parts = [PartObject(key=Callback(PlayVideo, url=url))],
       )
     ]
 
 ####################################################################################################
 @indirect
 def PlayVideo(url):
-
-    smil = XML.ElementFromURL(url + '&format=SMIL')
+    details = GetJSON(url)
+    try:    redirect_url = details['videos']['ipad']['url']
+    except: redirect_url = details['videos']['iphone']['url']
+    m3u8_url = JSON.ObjectFromURL(redirect_url + '?format=json')['url']
+    return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(url=m3u8_url))
     
-    rtmp_base = smil.xpath('//a:meta', namespaces=NAMESPACES)[0].get('base')
-    rtmp_url = smil.xpath('//a:ref', namespaces=NAMESPACES)[0].get('src')
-    
-    clip = rtmp_url
-    if '.mp4' in clip:
-        clip = 'mp4:' +  clip.split('.mp4')[0]
-    elif '.flv' in clip:
-        clip = clip.split('.flv')[0]
-    
-    return IndirectResponse(VideoClipObject, key=RTMPVideoURL(url=rtmp_base, clip=clip))
-    
+####################################################################################################
+def GetJSON(url):
+    video_id = url.split('id=')[1]
+    json = JSON.ObjectFromURL(JSON_URL + video_id)
+    return json['items'][0]
