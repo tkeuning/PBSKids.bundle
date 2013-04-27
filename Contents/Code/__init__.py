@@ -3,7 +3,7 @@ NAME = "PBS Kids"
 
 PBSKIDS_URL   = "http://www.pbskids.org/video/"
 PBSKIDS_SHOWS = "http://pbskids.org/go/video/js/org.pbskids.shows.js" #"http://pbskids.org/everything.html"
-VIDEO_LIST    = "http://pbskids.org/pbsk/video/api/getVideos/?startindex=%s&endindex=%s&program=%s&category=&group=&selectedID=&status=available&type=%s&return=airdate,+expirationdate,+rating"
+VIDEO_LIST    = "http://pbskids.org/pbsk/video/api/getVideos/?startindex=%d&endindex=%d&program=%s&status=available&type=%s&return=airdate,expirationdate,rating"
 CATEGORY_LIST = "http://pbs.feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=6HSLquMebdOkNaEygDWyPOIbkPAnQ0_C&query=CustomText|CategoryType|%s&query=HasReleases&field=title&field=thumbnailURL"
 
 OFFSET = 20
@@ -35,26 +35,21 @@ def MainMenu():
 def ShowPage(title, thumb):
 
     oc = ObjectContainer(title2=title)
-    oc.add(DirectoryObject(key=Callback(VideoPage, clip='Episode', title=title), title="Full Episodes",
+    oc.add(DirectoryObject(key=Callback(VideoPage, type='Episode', title=title), title="Full Episodes",
         thumb=Resource.ContentsOfURLWithFallback(url=thumb)))
-    oc.add(DirectoryObject(key=Callback(VideoPage, clip='Clip', title=title), title="Clips",
+    oc.add(DirectoryObject(key=Callback(VideoPage, type='Clip', title=title), title="Clips",
         thumb=Resource.ContentsOfURLWithFallback(url=thumb)))
 
     return oc
 
 ####################################################################################################
-@route(PREFIX + '/videos')
-def VideoPage(clip, title, offset=0):
+@route(PREFIX + '/videos', start=int)
+def VideoPage(type, title, start=0):
 
     oc = ObjectContainer(title2=title)
+    end = start+OFFSET
 
-    if offset == 0:
-        start = 0
-    else:
-        start = offset
-        offset = offset + OFFSET
-
-    content = JSON.ObjectFromURL(VIDEO_LIST % (start, offset, String.Quote(title, usePlus=True), clip), cacheTime=CACHE_1DAY)
+    content = JSON.ObjectFromURL(VIDEO_LIST % (start, end, String.Quote(title, usePlus=True), type), cacheTime=CACHE_1DAY)
 
     for item in content['items']:
         series_url = item['series_url']
@@ -72,15 +67,15 @@ def VideoPage(clip, title, offset=0):
             try: thumb = item['images']['originalres_16x9']['url']
             except: thumb = ''
 
-        if clip == 'Clip':
+        if type == 'Clip':
             oc.add(VideoClipObject(url=url, title=video_title, summary=summary, duration=duration,
                 thumb=Resource.ContentsOfURLWithFallback(thumb)))
         else:
             oc.add(EpisodeObject(url=url, title=video_title, show=title, summary=summary, duration=duration,
                 thumb=Resource.ContentsOfURLWithFallback(thumb)))
 
-    if int(content['matched']) > offset:
-        oc.add(NextPageObject(key=Callback(VideoPage, clip=clip, title=title, offset=offset), title="More"))
+    if int(content['matched']) > end:
+        oc.add(NextPageObject(key=Callback(VideoPage, type=type, title=title, start=end), title="More ..."))
 
     if len(oc) < 1:
         return ObjectContainer(header="Empty", message="There aren't any items")
