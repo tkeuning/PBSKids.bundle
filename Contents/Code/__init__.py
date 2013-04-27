@@ -61,11 +61,10 @@ def VideoPage(clip, title, offset=0):
         video_title = item['title']
         summary = item['description']
         duration = item['videos']['iphone']['length']
-        try:    thumb = item['images']['originalres_4x3']
+        try:    thumb = item['images']['originalres_4x3']['url']
         except:
-            try:    thumb = item['images']['originalres_16x9']
+            try:    thumb = item['images']['originalres_16x9']['url']
             except: thumb = ICON
-        
         if clip == 'Clip':
             oc.add(VideoClipObject(url=url, title=video_title, summary=summary, duration=duration,
                 thumb=Resource.ContentsOfURLWithFallback(thumb)))

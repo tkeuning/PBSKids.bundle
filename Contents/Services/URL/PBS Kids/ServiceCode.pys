@@ -3,7 +3,10 @@ JSON_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?id='
 def MetadataObjectForURL(url):
     details = GetJSON(url)
     title = details['title']
-    thumb = details['images']['originalres_4x3']
+    try:    thumb = item['images']['originalres_4x3']['url']
+        except:
+            try:    thumb = item['images']['originalres_16x9']['url']
+            except: thumb = R('icon-deafult.jpg)
     summary = details['description']
     duration = details['videos']['ipad']['length']
     if details['type'] =='Clip':
