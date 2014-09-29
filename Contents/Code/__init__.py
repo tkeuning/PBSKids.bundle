@@ -2,12 +2,12 @@ PREFIX = "/video/pbskids"
 NAME = "PBS Kids"
 
 PBSKIDS_URL   = "http://www.pbskids.org/video/"
-PBSKIDS_SHOWS = "http://pbskids.org/go/video/js/org.pbskids.shows.js" #"http://pbskids.org/everything.html"
+PBSKIDS_SHOWS = "http://pbskids.org/shell/video/data/org.pbskids.shows.json"
 VIDEO_LIST    = "http://pbskids.org/pbsk/video/api/getVideos/?startindex=%d&endindex=%d&program=%s&status=available&type=%s&return=airdate,expirationdate,rating"
-CATEGORY_LIST = "http://pbs.feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=6HSLquMebdOkNaEygDWyPOIbkPAnQ0_C&query=CustomText|CategoryType|%s&query=HasReleases&field=title&field=thumbnailURL"
+#CATEGORY_LIST = "http://pbs.feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=6HSLquMebdOkNaEygDWyPOIbkPAnQ0_C&query=CustomText|CategoryType|%s&query=HasReleases&field=title&field=thumbnailURL"  # No longer valid
 
 OFFSET = 20
-VIDEO_URL = '%sid=%s'
+VIDEO_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?guid=%s'
 
 ####################################################################################################
 def Start():
@@ -23,7 +23,7 @@ def MainMenu():
 
     for item in content:
         title = item['title']
-        thumb = item['thumbnail2URL']
+        thumb = item['thumbnailPreKLarge']
         summary = String.StripTags(item['description'])
         oc.add(DirectoryObject(key=Callback(ShowPage, title=title, thumb=thumb), title=title, summary=summary,
             thumb=Resource.ContentsOfURLWithFallback(url=thumb)))
@@ -52,12 +52,7 @@ def VideoPage(type, title, start=0):
     content = JSON.ObjectFromURL(VIDEO_LIST % (start, end, String.Quote(title, usePlus=True), type), cacheTime=CACHE_1DAY)
 
     for item in content['items']:
-        series_url = item['series_url']
-
-        if not series_url.endswith('/'):
-            series_url = series_url + '/'
-
-        url = VIDEO_URL % (series_url, item['id'])
+        url = VIDEO_URL % item['guid']
         video_title = item['title']
         summary = item['description']
         duration = item['videos']['iphone']['length']

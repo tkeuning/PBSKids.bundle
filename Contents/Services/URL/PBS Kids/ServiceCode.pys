@@ -1,4 +1,4 @@
-JSON_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?id='
+JSON_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?guid='
 
 ####################################################################################################
 def MetadataObjectForURL(url):
@@ -54,6 +54,6 @@ def PlayVideo(url):
 ####################################################################################################
 def GetJSON(url):
 
-    video_id = url.split('id=')[1]
+    video_id = url.split('guid=')[1]
     json = JSON.ObjectFromURL(JSON_URL + video_id)
     return json['items'][0]
