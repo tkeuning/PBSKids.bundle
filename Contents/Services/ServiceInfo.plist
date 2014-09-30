@@ -8,7 +8,7 @@
 		<dict>
 			<key>URLPatterns</key>
 			<array>
-				<string>http://pbskids.org/.+/?guid=\{?[a-fA-F\d]{8}-([a-fA-F\d]{4}-){3}[a-fA-F\d]{12}\}?</string>
+				<string>http://pbskids.org/.+/?guid=[a-fA-F\d]{8}-([a-fA-F\d]{4}-){3}[a-fA-F\d]{12}</string>
 			</array>
 		</dict>
 	</dict>
