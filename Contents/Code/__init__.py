@@ -57,9 +57,9 @@ def VideoPage(type, title, start=0):
         summary = item['description']
         duration = item['videos']['iphone']['length']
 
-        try: thumb = item['images']['originalres_4x3']['url']
+        try: thumb = item['images']['originalres_16x9']['url']
         except:
-            try: thumb = item['images']['originalres_16x9']['url']
+            try: thumb = item['images']['originalres_4x3']['url']
             except: thumb = ''
 
         if type == 'Clip':
