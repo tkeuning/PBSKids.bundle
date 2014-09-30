@@ -9,9 +9,9 @@ def MetadataObjectForURL(url):
     summary = details['description']
     duration = details['videos']['ipad']['length']
 
-    try: thumb = item['images']['originalres_4x3']['url']
+    try: thumb = item['images']['originalres_16x9']['url']
     except:
-        try: thumb = item['images']['originalres_16x9']['url']
+        try: thumb = item['images']['originalres_4x3']['url']
         except: thumb = ''
 
     if details['type'] =='Clip':
