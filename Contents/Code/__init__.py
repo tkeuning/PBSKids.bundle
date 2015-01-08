@@ -2,7 +2,7 @@ PREFIX = "/video/pbskids"
 NAME = "PBS Kids"
 
 PBSKIDS_URL   = "http://www.pbskids.org/video/"
-PBSKIDS_SHOWS = "http://pbskids.org/shell/video/data/org.pbskids.shows.json"
+PBSKIDS_SHOWS = "http://pbskids.org/video/data/org.pbskids.shows.json"
 VIDEO_LIST    = "http://pbskids.org/pbsk/video/api/getVideos/?startindex=%d&endindex=%d&program=%s&status=available&type=%s&return=airdate,expirationdate,rating"
 #CATEGORY_LIST = "http://pbs.feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=6HSLquMebdOkNaEygDWyPOIbkPAnQ0_C&query=CustomText|CategoryType|%s&query=HasReleases&field=title&field=thumbnailURL"  # No longer valid
 
