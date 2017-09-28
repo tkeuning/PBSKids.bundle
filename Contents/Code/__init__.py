@@ -49,12 +49,16 @@ def ShowPage(title, thumb):
 
     oc = ObjectContainer(title2=title)
 
-    oc.add(DirectoryObject(key=Callback(VideoPage, type='Episode', title=title), title='Full Episodes',
-        thumb=Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
+    oc.add(DirectoryObject(
+        key = Callback(VideoPage, type='Episode', title=title),
+        title = 'Full Episodes',
+        thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
     ))
 
-    oc.add(DirectoryObject(key=Callback(VideoPage, type='Clip', title=title), title='Clips',
-        thumb=Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
+    oc.add(DirectoryObject(
+        key = Callback(VideoPage, type='Clip', title=title),
+        title = 'Clips',
+        thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
     ))
 
     return oc
@@ -76,22 +80,38 @@ def VideoPage(type, title, start=0):
         try: duration = item['videos']['iphone']['length']
         except: duration = None
 
-        try: thumb = item['images']['originalres_16x9']['url']
-        except:
-            try: thumb = item['images']['originalres_4x3']['url']
-            except: thumb = ''
+        thumb = ''
+        images = ['kids-mezzannine-16x9', 'originalres_16x9', 'kids-mezzannine-4x3', 'originalres_4x3']
+
+        for img in images:
+            if img in item['images'] and 'url' in item['images'][img] and item['images'][img]['url']:
+                thumb = item['images'][img]['url']
+                break
 
         if type == 'Clip':
-            oc.add(VideoClipObject(url=url, title=video_title, summary=summary, duration=duration,
-                thumb=Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
+            oc.add(VideoClipObject(
+                url = url,
+                title = video_title,
+                summary = summary,
+                duration = duration,
+                thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
             ))
         else:
-            oc.add(EpisodeObject(url=url, title=video_title, show=title, summary=summary, duration=duration,
-                thumb=Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
+            oc.add(EpisodeObject(
+                url = url,
+                title = video_title,
+                show = title,
+                summary = summary,
+                duration = duration,
+                thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
             ))
 
     if int(json_obj['matched']) > end:
-        oc.add(NextPageObject(key=Callback(VideoPage, type=type, title=title, start=end), title='More ...'))
+
+        oc.add(NextPageObject(
+            key = Callback(VideoPage, type=type, title=title, start=end),
+            title = 'More ...'
+        ))
 
     if len(oc) < 1:
         return ObjectContainer(header='Empty', message="There aren't any items")

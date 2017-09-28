@@ -7,12 +7,17 @@ def MetadataObjectForURL(url):
 
     title = details['title']
     summary = details['description']
-    duration = details['videos']['ipad']['length']
 
-    try: thumb = details['images']['originalres_16x9']['url']
-    except:
-        try: thumb = details['images']['originalres_4x3']['url']
-        except: thumb = ''
+    try: duration = details['videos']['iphone']['length']
+    except: duration = None
+
+    thumb = ''
+    images = ['kids-mezzannine-16x9', 'originalres_16x9', 'kids-mezzannine-4x3', 'originalres_4x3']
+
+    for img in images:
+        if img in details['images'] and 'url' in details['images'][img] and details['images'][img]['url']:
+            thumb = details['images'][img]['url']
+            break
 
     if details['type'] =='Clip':
         return VideoClipObject(
