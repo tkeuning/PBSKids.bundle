@@ -71,7 +71,8 @@ def VideoPage(type, title, start=0):
         url = VIDEO_URL % item['guid']
         video_title = item['title']
         summary = item['description']
-        duration = item['videos']['iphone']['length']
+        try: duration = item['videos']['iphone']['length']
+        except: duration = None
 
         try: thumb = item['images']['originalres_16x9']['url']
         except:
