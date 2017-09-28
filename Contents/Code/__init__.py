@@ -1,5 +1,7 @@
 PREFIX = '/video/pbskids'
 NAME = 'PBS Kids'
+ART = 'art-default.jpg'
+ICON = 'icon-default.jpg'
 
 PBSKIDS_URL = 'http://www.pbskids.org/video/'
 PBSKIDS_SHOWS = 'http://pbskids.org/pbsk/video/api/getShows/?return=images'
@@ -14,7 +16,7 @@ def Start():
     ObjectContainer.title1 = NAME
 
 ####################################################################################################
-@handler(PREFIX, NAME)
+@handler(PREFIX, NAME, art=ART, thumb=ICON)
 def MainMenu():
 
     oc = ObjectContainer()
@@ -36,7 +38,7 @@ def MainMenu():
             key = Callback(ShowPage, title=title, thumb=thumb),
             title = title,
             summary = summary,
-            thumb = Resource.ContentsOfURLWithFallback(url=thumb)
+            thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
         ))
 
     return oc
@@ -48,11 +50,11 @@ def ShowPage(title, thumb):
     oc = ObjectContainer(title2=title)
 
     oc.add(DirectoryObject(key=Callback(VideoPage, type='Episode', title=title), title='Full Episodes',
-        thumb=Resource.ContentsOfURLWithFallback(url=thumb)
+        thumb=Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
     ))
 
     oc.add(DirectoryObject(key=Callback(VideoPage, type='Clip', title=title), title='Clips',
-        thumb=Resource.ContentsOfURLWithFallback(url=thumb)
+        thumb=Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
     ))
 
     return oc
@@ -81,11 +83,11 @@ def VideoPage(type, title, start=0):
 
         if type == 'Clip':
             oc.add(VideoClipObject(url=url, title=video_title, summary=summary, duration=duration,
-                thumb=Resource.ContentsOfURLWithFallback(thumb)
+                thumb=Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
             ))
         else:
             oc.add(EpisodeObject(url=url, title=video_title, show=title, summary=summary, duration=duration,
-                thumb=Resource.ContentsOfURLWithFallback(thumb)
+                thumb=Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
             ))
 
     if int(json_obj['matched']) > end:
