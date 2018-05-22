@@ -7,7 +7,7 @@ PBSKIDS_URL = 'http://www.pbskids.org/video/'
 PBSKIDS_SHOWS = 'http://pbskids.org/pbsk/video/api/getShows/?return=images'
 VIDEO_LIST = 'http://pbskids.org/pbsk/video/api/getVideos/?startindex=%d&endindex=%d&program=%s&status=available&type=%s&return=airdate,expirationdate,rating'
 VIDEO_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?guid=%s'
-
+SHOW_ICON_URL = 'http://www-tc.pbskids.org/shell/images/content/show-bubbles/square/%s.png'
 OFFSET = 20
 
 ####################################################################################################
@@ -30,8 +30,10 @@ def MainMenu():
             slug = item['cove_slug']
 
             # The API appears to no longer serve thumbnail URLs
-            # Could eventually try to find another source for thumbnails
-            thumb = ''
+            # This hack gets some thumbnails, in some cases the 
+            # slug matches the image filename on the pbs site.
+            # Fails for some shows.
+            thumb = SHOW_ICON_URL % slug
 
             oc.add(DirectoryObject(
                 key = Callback(ShowPage, title=title, thumb=thumb, slug=slug),
