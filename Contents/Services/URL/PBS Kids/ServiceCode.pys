@@ -8,7 +8,7 @@ def MetadataObjectForURL(url):
     title = details['title']
     summary = details['description']
 
-    try: duration = details['videos']['iphone']['length']
+    try: duration = details['duration']
     except: duration = None
 
     thumb = ''
@@ -26,7 +26,10 @@ def MetadataObjectForURL(url):
             thumb = Resource.ContentsOfURLWithFallback(thumb)
         )
     else:
-        show_title = details['series_title']
+        if details['show'] is not None:
+            show_title = details['show']['attributes']['title']
+        else:
+            show_title = details['parent_tree']['attributes']['title']
         return EpisodeObject(
             title = title,
             show = show_title,
@@ -36,7 +39,6 @@ def MetadataObjectForURL(url):
 
 ####################################################################################################
 def MediaObjectsForURL(url):
-
     return [
         MediaObject(
             video_codec = VideoCodec.H264,
@@ -51,9 +53,25 @@ def MediaObjectsForURL(url):
 def PlayVideo(url):
 
     details = GetJSON(url)
-    try:    redirect_url = details['videos']['ipad']['url']
-    except: redirect_url = details['videos']['iphone']['url']
+    vid_profiles = {vid['profile']:vid['url'] for vid in details['videos']}
+    preferred_profile_list = ['hls-16x9-1080p',
+                              'hls-16x9-720p',
+                              'hls-1080p-16x9',
+                              'hls-2500k-16x9',
+                              'ipad-16x9',
+                              'iphone-16x9',
+                              'hls-2500k-4x3',
+                              'ipad-4x3',
+                              'iphone-4x3']
+    for profile_name in preferred_profile_list:
+        if profile_name in vid_profiles:
+            selected_profile=profile_name
+            break
+    try:    redirect_url = vid_profiles[selected_profile] 
+    except: redirect_url = details['videos'][0]['url']
     m3u8_url = JSON.ObjectFromURL(redirect_url + '?format=json')['url']
+    # Force http for m3u8, https crashing
+    m3u8_url = m3u8_url.replace('https:','http:')
     return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(url=m3u8_url))
     
 ####################################################################################################

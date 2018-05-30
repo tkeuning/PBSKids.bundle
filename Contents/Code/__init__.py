@@ -7,7 +7,7 @@ PBSKIDS_URL = 'http://www.pbskids.org/video/'
 PBSKIDS_SHOWS = 'http://pbskids.org/pbsk/video/api/getShows/?return=images'
 VIDEO_LIST = 'http://pbskids.org/pbsk/video/api/getVideos/?startindex=%d&endindex=%d&program=%s&status=available&type=%s&return=airdate,expirationdate,rating'
 VIDEO_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?guid=%s'
-
+SHOW_ICON_URL = 'http://www-tc.pbskids.org/shell/images/content/show-bubbles/square/%s.png'
 OFFSET = 20
 
 ####################################################################################################
@@ -23,40 +23,41 @@ def MainMenu():
     json_obj = JSON.ObjectFromURL(PBSKIDS_SHOWS)
 
     for item in json_obj['items']:
-
         title = item['title']
         summary = String.StripTags(item['description'])
+        # API now uses slug for program id
+        if 'cove_slug' in item:
+            slug = item['cove_slug']
 
-        if 'program-mezzanine-16x9' in item['images']:
-            thumb = item['images']['program-mezzanine-16x9']['url']
-        elif 'program-kids-square' in item['images']:
-            thumb = item['images']['program-kids-square']['url']
-        else:
-            thumb = ''
+            # The API appears to no longer serve thumbnail URLs
+            # This hack gets some thumbnails, in some cases the 
+            # slug matches the image filename on the pbs site.
+            # Fails for some shows.
+            thumb = SHOW_ICON_URL % slug
 
-        oc.add(DirectoryObject(
-            key = Callback(ShowPage, title=title, thumb=thumb),
-            title = title,
-            summary = summary,
-            thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
-        ))
+            oc.add(DirectoryObject(
+                key = Callback(ShowPage, title=title, thumb=thumb, slug=slug),
+                title = title,
+                summary = summary,
+                thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
+            ))
 
     return oc
 
 ####################################################################################################
 @route(PREFIX + '/show')
-def ShowPage(title, thumb):
+def ShowPage(title, thumb, slug=''):
 
     oc = ObjectContainer(title2=title)
 
     oc.add(DirectoryObject(
-        key = Callback(VideoPage, type='Episode', title=title),
+        key = Callback(VideoPage, type='Episode', title=title, slug=slug),
         title = 'Full Episodes',
         thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
     ))
 
     oc.add(DirectoryObject(
-        key = Callback(VideoPage, type='Clip', title=title),
+        key = Callback(VideoPage, type='Clip', title=title, slug=slug),
         title = 'Clips',
         thumb = Resource.ContentsOfURLWithFallback(url=thumb, fallback=ICON)
     ))
@@ -65,12 +66,12 @@ def ShowPage(title, thumb):
 
 ####################################################################################################
 @route(PREFIX + '/videos', start=int)
-def VideoPage(type, title, start=0):
+def VideoPage(type, title, slug, start=0):
 
     oc = ObjectContainer(title2=title)
     end = start+OFFSET
 
-    json_obj = JSON.ObjectFromURL(VIDEO_LIST % (start, end, String.Quote(title, usePlus=True), type), cacheTime=CACHE_1DAY)
+    json_obj = JSON.ObjectFromURL(VIDEO_LIST % (start, end, String.Quote(slug, usePlus=True), type), cacheTime=CACHE_1DAY)
 
     for item in json_obj['items']:
 
