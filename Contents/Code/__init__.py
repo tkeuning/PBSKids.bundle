@@ -1,3 +1,6 @@
+import urllib2
+import ssl
+
 PREFIX = '/video/pbskids'
 NAME = 'PBS Kids'
 ART = 'art-default.jpg'
@@ -20,7 +23,10 @@ def Start():
 def MainMenu():
 
     oc = ObjectContainer()
-    json_obj = JSON.ObjectFromURL(PBSKIDS_SHOWS)
+    req = urllib2.Request(PBSKIDS_SHOWS)
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+    show_data = urllib2.urlopen(req, context=ssl_context).read()
+    json_obj = JSON.ObjectFromString(show_data)
 
     for item in json_obj['items']:
         title = item['title']
@@ -70,8 +76,11 @@ def VideoPage(type, title, slug, start=0):
 
     oc = ObjectContainer(title2=title)
     end = start+OFFSET
-
-    json_obj = JSON.ObjectFromURL(VIDEO_LIST % (start, end, String.Quote(slug, usePlus=True), type), cacheTime=CACHE_1DAY)
+    
+    req = urllib2.Request(VIDEO_LIST % (start, end, String.Quote(slug, usePlus=True), type))
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+    video_list = urllib2.urlopen(req, context=ssl_context).read()
+    json_obj = JSON.ObjectFromString(video_list)
 
     for item in json_obj['items']:
 

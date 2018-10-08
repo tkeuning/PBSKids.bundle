@@ -1,3 +1,6 @@
+import urllib2
+import ssl
+
 JSON_URL = 'http://pbskids.org/pbsk/video/api/getVideos/?guid='
 
 ####################################################################################################
@@ -69,14 +72,21 @@ def PlayVideo(url):
             break
     try:    redirect_url = vid_profiles[selected_profile] 
     except: redirect_url = details['videos'][0]['url']
-    m3u8_url = JSON.ObjectFromURL(redirect_url + '?format=json')['url']
+    req = urllib2.Request(redirect_url + '?format=json')
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+    data = urllib2.urlopen(req, context=ssl_context).read()
+    json = JSON.ObjectFromString(data)
+    m3u8_url = json['url']
     # Force http for m3u8, https crashing
-    m3u8_url = m3u8_url.replace('https:','http:')
+    # m3u8_url = m3u8_url.replace('https:','http:')
     return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(url=m3u8_url))
     
 ####################################################################################################
 def GetJSON(url):
 
     video_id = url.split('guid=')[1]
-    json = JSON.ObjectFromURL(JSON_URL + video_id)
+    req = urllib2.Request(JSON_URL + video_id)
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+    data = urllib2.urlopen(req, context=ssl_context).read()
+    json = JSON.ObjectFromString(data)
     return json['items'][0]
