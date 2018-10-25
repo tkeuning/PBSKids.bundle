@@ -10,7 +10,7 @@ PBSKIDS_URL = 'https://www.pbskids.org/video/'
 PBSKIDS_SHOWS = 'https://pbskids.org/pbsk/video/api/getShows/?return=images'
 VIDEO_LIST = 'https://pbskids.org/pbsk/video/api/getVideos/?startindex=%d&endindex=%d&program=%s&status=available&type=%s&return=airdate,expirationdate,rating'
 VIDEO_URL = 'https://pbskids.org/pbsk/video/api/getVideos/?guid=%s'
-SHOW_ICON_URL = 'https://www-tc.pbskids.org/shell/images/content/show-bubbles/square/%s.png'
+SHOW_ICON_URL = 'http://www-tc.pbskids.org/shell/images/content/show-bubbles/square/%s.png'
 OFFSET = 20
 
 ####################################################################################################
